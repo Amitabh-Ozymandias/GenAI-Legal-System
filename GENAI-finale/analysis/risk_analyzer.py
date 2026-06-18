@@ -1,4 +1,4 @@
-from config import model
+from config import get_model
 
 from analysis.json_parser import extract_json
 
@@ -119,7 +119,7 @@ Example:
 
     try:
 
-        response = model.generate_content(
+        response = get_model().generate_content(
             prompt
         )
 

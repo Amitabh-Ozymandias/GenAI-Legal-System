@@ -1,4 +1,4 @@
-from config import model
+from config import get_model
 
 
 def compare_contract_clauses(
@@ -41,7 +41,7 @@ Return readable text.
 {comparison_text}
 """
 
-    response = model.generate_content(
+    response = get_model().generate_content(
         prompt
     )
 

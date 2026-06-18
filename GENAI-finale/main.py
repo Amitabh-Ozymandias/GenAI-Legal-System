@@ -16,11 +16,19 @@ from analysis.contract_comparison import (
 
 import shutil
 import os
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn")
 
 app = FastAPI(
     title="Legal Document Intelligence System"
 )
+
+@app.on_event("startup")
+def on_startup():
+    logger.info("App startup completed")
+    logger.info("Port binding completed")
 
 # -------------------------------
 # CORS CONFIGURATION

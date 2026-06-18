@@ -1,4 +1,4 @@
-from sentence_transformers import SentenceTransformer
+import logging
 
 _embedding_model = None
 
@@ -6,6 +6,9 @@ def get_embedding_model():
     global _embedding_model
 
     if _embedding_model is None:
+        logger = logging.getLogger("uvicorn")
+        logger.info("[LAZY LOAD] SentenceTransformer model for chatbot loaded lazily on first request")
+        from sentence_transformers import SentenceTransformer
         _embedding_model = SentenceTransformer(
             "all-MiniLM-L6-v2"
         )

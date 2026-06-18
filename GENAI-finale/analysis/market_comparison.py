@@ -1,12 +1,21 @@
 import json
+import logging
 
-from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
-)
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        logger = logging.getLogger("uvicorn")
+        logger.info("[LAZY LOAD] SentenceTransformer model loaded lazily on first request")
+        from sentence_transformers import SentenceTransformer
+        _model = SentenceTransformer(
+            "all-MiniLM-L6-v2"
+        )
+    return _model
 
 
 def load_standards():
@@ -38,12 +47,12 @@ def compare_clause(
         clause_type
     ]["standard"]
 
-    clause_embedding = model.encode(
+    clause_embedding = get_model().encode(
         [clause_text],
         convert_to_numpy=True
     )
 
-    standard_embedding = model.encode(
+    standard_embedding = get_model().encode(
         [standard_clause],
         convert_to_numpy=True
     )

@@ -1,10 +1,11 @@
-import faiss
-import numpy as np
-
+import logging
 
 class VectorStore:
 
     def __init__(self):
+        import faiss
+        logger = logging.getLogger("uvicorn")
+        logger.info("[LAZY LOAD] FAISS library imported and index initialized")
 
         self.dimension = 384
 
@@ -19,6 +20,7 @@ class VectorStore:
         text,
         embedding
     ):
+        import numpy as np
 
         embedding = np.array(
             [embedding],
@@ -38,6 +40,7 @@ class VectorStore:
         query_embedding,
         k=5
     ):
+        import numpy as np
 
         query_embedding = np.array(
             [query_embedding],
