@@ -1,0 +1,29 @@
+{
+  "termination": {
+    "standard": "Either party may terminate this agreement with thirty days written notice."
+  },
+
+  "confidentiality": {
+    "standard": "Both parties shall maintain confidentiality of proprietary information disclosed under this agreement."
+  },
+
+  "payment_terms": {
+    "standard": "Invoices shall be paid within thirty days of receipt."
+  },
+
+  "ip_ownership": {
+    "standard": "Each party retains ownership of its pre-existing intellectual property."
+  },
+
+  "governing_law": {
+    "standard": "This agreement shall be governed by the laws of the applicable jurisdiction."
+  },
+
+  "limitation_of_liability": {
+    "standard": "Liability shall be limited to direct damages and capped at fees paid under this agreement."
+  },
+
+  "indemnity": {
+    "standard": "Each party shall indemnify the other against third-party claims arising from its negligence or misconduct."
+  }
+}
