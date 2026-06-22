@@ -198,6 +198,17 @@ This is implemented but **not yet exposed** as an API endpoint in `main.py`.
 | `POST` | `/analyze` | Upload and analyze a single contract (`file`) |
 | `POST` | `/compare` | Upload and compare two contracts (`contract_a`, `contract_b`) |
 
+
+## Example Workflow
+
+1. Upload a PDF or DOCX contract.
+2. The backend extracts text and splits it into clauses.
+3. Each clause is classified by type.
+4. Risk scores are generated using Gemini with local fallbacks.
+5. Clauses are compared against market standards.
+6. Results are displayed in the dashboard with an executive summary.
+
+
 ### Example: analyze response shape
 
 ```json
