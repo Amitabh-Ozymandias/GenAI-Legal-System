@@ -38,8 +38,13 @@ QUESTION:
 {question}
 """
 
-    response = get_model().generate_content(
-        prompt
-    )
-
-    return response.text
+    try:
+        response = get_model().generate_content(
+            prompt
+        )
+        if response and response.text:
+            return response.text.strip()
+        return "The contract does not provide enough information."
+    except Exception as e:
+        print(f"Chat model error: {e}")
+        return f"Unable to answer query due to AI service issue: {str(e)}"

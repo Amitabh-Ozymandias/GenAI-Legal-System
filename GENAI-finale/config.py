@@ -18,7 +18,13 @@ def get_model():
             raise ValueError("GEMINI_API_KEY not found in .env")
         
         genai.configure(api_key=API_KEY)
-        _model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash"
-        )
+        for model_name in ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-2.0-flash"]:
+            try:
+                _model = genai.GenerativeModel(model_name=model_name)
+                logger.info(f"[LAZY LOAD] Loaded Gemini model: {model_name}")
+                break
+            except Exception:
+                continue
+        if _model is None:
+            _model = genai.GenerativeModel(model_name="gemini-2.5-flash")
     return _model

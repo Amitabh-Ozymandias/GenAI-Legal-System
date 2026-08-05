@@ -19,10 +19,9 @@ def split_into_clauses(text):
 
     heading_pattern = re.compile(
         r"(?m)^("
-        r"\d+(\.\d+)*\s+[A-Z][^\n]*|"        # 1 Definitions / 2.1 Payment Terms
-        r"ARTICLE\s+[IVXLC]+\b[^\n]*|"       # ARTICLE I
-        r"SECTION\s+\d+(\.\d+)*[^\n]*|"      # SECTION 2.3
-        r"[A-Z][A-Z\s]{3,}$"                 # TERMINATION RIGHTS
+        r"\d+(\.\d+)*[\s\.\:]+[A-Za-z0-9][^\n]*|"   # 1. Definitions / 2.1 Payment Terms / 1.0 General
+        r"(ARTICLE|SECTION|CLAUSE)\s+[IVXLC0-9]+(\.[0-9]+)*[^\n]*|" # ARTICLE I / SECTION 2.3 / CLAUSE 5
+        r"[A-Z][A-Z\s]{3,}$"                        # TERMINATION RIGHTS
         r")"
     )
 
@@ -56,6 +55,8 @@ def split_into_clauses(text):
         title = lines[0].strip()
 
         content = "\n".join(lines[1:]).strip()
+        if not content:
+            content = title
 
         clauses.append(
             {

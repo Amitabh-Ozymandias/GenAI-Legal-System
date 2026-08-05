@@ -4,21 +4,18 @@ import re
 
 def extract_json(response_text):
 
-    response_text = response_text.strip()
+    text = response_text.strip()
 
-    response_text = re.sub(
-        r"^```json",
-        "",
-        response_text,
-        flags=re.IGNORECASE
-    )
+    # Strip code block wrappers
+    text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s*```$", "", text)
+    text = text.strip()
 
-    response_text = re.sub(
-        r"```$",
-        "",
-        response_text
-    )
-
-    response_text = response_text.strip()
-
-    return json.loads(response_text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # Fallback: extract substring between first '{' and last '}'
+        match = re.search(r"(\{.*\})", text, re.DOTALL)
+        if match:
+            return json.loads(match.group(1))
+        raise

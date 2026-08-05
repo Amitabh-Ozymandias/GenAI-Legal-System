@@ -29,15 +29,18 @@ def get_standard_embedding(clause_type, standard_clause):
     return _standards_embeddings_cache[clause_type]
 
 
+import os
+
+_standards_cache = None
+
 def load_standards():
-
-    with open(
-        "data/standards/market_standards.json",
-        "r",
-        encoding="utf-8"
-    ) as file:
-
-        return json.load(file)
+    global _standards_cache
+    if _standards_cache is None:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        json_path = os.path.join(base_dir, "data", "standards", "market_standards.json")
+        with open(json_path, "r", encoding="utf-8") as file:
+            _standards_cache = json.load(file)
+    return _standards_cache
 
 
 def compare_clause(

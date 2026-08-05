@@ -71,6 +71,10 @@ def local_risk_analysis(
     }
 
 
+import asyncio
+
+_semaphore = asyncio.Semaphore(4)
+
 async def analyze_risk(
     clause_title,
     clause_content,
@@ -117,25 +121,30 @@ Example:
 }}
 """
 
-    try:
+    async with _semaphore:
+        for attempt in range(3):
+            try:
+                response = await get_model().generate_content_async(
+                    prompt
+                )
 
-        response = await get_model().generate_content_async(
-            prompt
-        )
+                parsed = extract_json(
+                    response.text
+                )
 
-        parsed = extract_json(
-            response.text
-        )
+                parsed["source"] = "gemini"
 
-        parsed["source"] = "gemini"
+                return parsed
 
-        return parsed
-
-    except Exception as e:
-
-        print(
-            f"Gemini failed: {e}"
-        )
+            except Exception as e:
+                err_str = str(e)
+                if "429" in err_str or "ResourceExhausted" in err_str:
+                    await asyncio.sleep(1.5 * (attempt + 1))
+                    continue
+                print(
+                    f"Gemini risk analysis failed: {e}"
+                )
+                break
 
         return local_risk_analysis(
             clause_type
