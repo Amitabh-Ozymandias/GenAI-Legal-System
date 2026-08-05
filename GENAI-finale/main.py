@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi import UploadFile
 from fastapi import File
+from fastapi import Form
 
 from fastapi.middleware.cors import (
     CORSMiddleware
@@ -12,6 +13,14 @@ from analysis.contract_analyzer import (
 
 from analysis.contract_comparison import (
     compare_contracts
+)
+
+from chatbot.index_builder import (
+    build_contract_index
+)
+
+from chatbot.chatbot import (
+    ask_contract_question
 )
 
 import shutil
@@ -39,7 +48,8 @@ app.add_middleware(
 
     allow_origins=[
         "http://localhost:5173",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "https://genai-legal-system.onrender.com"
     ],
 
     allow_credentials=True,
@@ -118,7 +128,7 @@ async def analyze_document(
 
     try:
 
-        result = analyze_contract(
+        result = await analyze_contract(
             file_path
         )
 
@@ -187,13 +197,11 @@ async def compare_documents(
         )
 
     try:
+        import asyncio
 
-        result_a = analyze_contract(
-            path_a
-        )
-
-        result_b = analyze_contract(
-            path_b
+        result_a, result_b = await asyncio.gather(
+            analyze_contract(path_a),
+            analyze_contract(path_b)
         )
 
         comparison = compare_contracts(
@@ -220,3 +228,65 @@ async def compare_documents(
         "comparison":
             comparison
     }
+
+# -------------------------------
+# CHAT WITH CONTRACT
+# -------------------------------
+
+@app.post("/chat")
+async def chat_with_contract(
+
+    file: UploadFile = File(...),
+
+    question: str = Form(...)
+):
+
+    filename = os.path.basename(
+        file.filename or "chat_file.pdf"
+    )
+
+    file_path = os.path.join(
+        UPLOAD_DIR,
+        filename
+    )
+
+    with open(
+        file_path,
+        "wb"
+    ) as buffer:
+
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
+
+    try:
+
+        result = await analyze_contract(
+            file_path
+        )
+
+        vector_store = build_contract_index(
+            result["clauses"]
+        )
+
+        answer = ask_contract_question(
+            question,
+            vector_store
+        )
+
+    finally:
+
+        if os.path.exists(
+            file_path
+        ):
+
+            os.remove(
+                file_path
+            )
+
+    return {
+        "answer": answer,
+        "file_name": result["file_name"],
+        "total_clauses": result["total_clauses"]
+    }

@@ -1,4 +1,4 @@
-from config import model
+from config import get_model
 
 from chatbot.retriever import retrieve_context
 
@@ -38,7 +38,7 @@ QUESTION:
 {question}
 """
 
-    response = model.generate_content(
+    response = get_model().generate_content(
         prompt
     )
 

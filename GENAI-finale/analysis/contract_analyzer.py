@@ -35,7 +35,8 @@ def extract_text(file_path):
     )
 
 
-def analyze_contract(file_path):
+async def analyze_contract(file_path):
+    import asyncio
 
     text = extract_text(
         file_path
@@ -45,31 +46,48 @@ def analyze_contract(file_path):
         text
     )
 
-    analyzed_clauses = []
-
-    risk_scores = []
+    # Pre-classify clauses and prepare risk tasks for concurrent execution
+    risk_tasks = []
+    classifications = []
 
     for clause in clauses:
-
         title = clause["title"]
-
         content = clause["content"]
-
+        
         classification = classify_clause(
             title,
             content
         )
-
+        classifications.append(classification)
+        
         clause_type = classification.get(
             "clause_type",
             "other"
         )
-
-        risk = analyze_risk(
-            title,
-            content,
-            clause_type
+        
+        risk_tasks.append(
+            analyze_risk(
+                title,
+                content,
+                clause_type
+            )
         )
+
+    # Resolve all Gemini API requests concurrently
+    risk_results = await asyncio.gather(*risk_tasks)
+
+    analyzed_clauses = []
+    risk_scores = []
+
+    for i, clause in enumerate(clauses):
+        title = clause["title"]
+        content = clause["content"]
+        classification = classifications[i]
+        clause_type = classification.get(
+            "clause_type",
+            "other"
+        )
+        risk = risk_results[i]
 
         comparison = compare_clause(
             content,

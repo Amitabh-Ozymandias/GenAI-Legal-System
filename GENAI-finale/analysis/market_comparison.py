@@ -5,6 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 _model = None
+_standards_embeddings_cache = {}
 
 def get_model():
     global _model
@@ -16,6 +17,16 @@ def get_model():
             "all-MiniLM-L6-v2"
         )
     return _model
+
+
+def get_standard_embedding(clause_type, standard_clause):
+    global _standards_embeddings_cache
+    if clause_type not in _standards_embeddings_cache:
+        _standards_embeddings_cache[clause_type] = get_model().encode(
+            [standard_clause],
+            convert_to_numpy=True
+        )
+    return _standards_embeddings_cache[clause_type]
 
 
 def load_standards():
@@ -52,10 +63,7 @@ def compare_clause(
         convert_to_numpy=True
     )
 
-    standard_embedding = get_model().encode(
-        [standard_clause],
-        convert_to_numpy=True
-    )
+    standard_embedding = get_standard_embedding(clause_type, standard_clause)
 
     similarity = cosine_similarity(
         clause_embedding,

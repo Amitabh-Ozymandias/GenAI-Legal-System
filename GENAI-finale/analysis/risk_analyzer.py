@@ -71,7 +71,7 @@ def local_risk_analysis(
     }
 
 
-def analyze_risk(
+async def analyze_risk(
     clause_title,
     clause_content,
     clause_type
@@ -119,7 +119,7 @@ Example:
 
     try:
 
-        response = get_model().generate_content(
+        response = await get_model().generate_content_async(
             prompt
         )
 

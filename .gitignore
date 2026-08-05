@@ -1,2 +1,11 @@
 .env
 node_modules
+dist
+__pycache__/
+*.pyc
+.venv/
+uploads/
+temp/
+queries.csv
+structure.txt
+.DS_Store
